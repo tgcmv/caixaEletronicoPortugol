@@ -3,8 +3,10 @@ programa
 inclua biblioteca Arquivos --> a
 inclua biblioteca Util --> util
 inclua biblioteca Texto --> tx
+inclua biblioteca Objetos --> o
 	
 cadeia idioma = "ptBr"
+logico logado = falso
 
 funcao inicio()
 {
@@ -29,26 +31,71 @@ funcao acessarConta(){
 	escreval("Digite o numero da sua conta e sua senha de 6 digitos")
 	inteiro conta, senha
 	leia(conta, senha)
-	cadeia dadosConta = buscaConta(conta)
-	escreval(dadosConta)
+	inteiro objConta = buscaConta(conta)
 
+	se(objConta == -1){
+		escreval("Conta não encontrada")
+	} senao {
+		//TODO validar senha
+		logado = verdadeiro
+		telaOperacaoBancaria(objConta)
+	}
 }
 
-funcao cadeia buscaConta(inteiro conta){
-	cadeia dadosConta = "Conta não encontrada"
+funcao telaOperacaoBancaria(inteiro objConta){
+	cadeia nome = o.obter_propriedade_tipo_cadeia(objConta, "nome")
+	
+	enquanto(logado){
+		limpa()
+		escreval("Olá " + nome)
+		escreval(" Escolha uma opção: ")
+		escreval(" 1 - Saldo")
+		escreval(" 2 - Extrato")
+		escreval(" 3 - Saque")
+		escreval(" 4 - Deposito")
+		escreval(" 5 - Sair")
+		inteiro opcao
+		leia(opcao)
+		escolha(opcao){
+
+			caso 1: 
+				escreva("saldo escolhido")
+				pare
+			caso 2: 
+				escreva("extrato escolhido")
+				pare
+			caso 3: 
+				escreva("saque escolhido")
+				pare
+			caso 4: 
+				escreva("deposito escolhido")
+				pare
+			caso 5: 
+				escreva("sair escolhido")
+				logado = falso
+				pare
+			caso contrario: 
+				escreva(" Opção invalida ")
+				pare
+		}
+	}
+}
+
+funcao inteiro buscaConta(inteiro conta){
+	inteiro objConta = -1
 	inteiro arq = a.abrir_arquivo("./arquivo/contas.txt", a.MODO_LEITURA)
 	
 	enquanto (nao a.fim_arquivo(arq)){
 		cadeia linha = a.ler_linha(arq)					
-		inteiro posicao = tx.posicao_texto("conta\": " + conta, linha, 0)
+		inteiro posicao = tx.posicao_texto("conta\" : " + conta, linha, 0)
 		logico contaEncontrada = (posicao > 0)
 		se(contaEncontrada){
-			dadosConta = linha
+			objConta = o.criar_objeto_via_json(linha)
 			pare
 		}
 	}
 
-	retorne dadosConta;
+	retorne objConta;
 }
 
 funcao criarConta(){
@@ -81,11 +128,11 @@ funcao criarConta(){
 	senha = cadastraSenha()
 
 	inteiro numDaConta = numeroDaConta()
-	cadeia dadosDaConta = "{\"conta\": " + numDaConta + ","
-	dadosDaConta = dadosDaConta + " \"cpf\":" + cpf  + ","
-	dadosDaConta += " \"dtNascimento\":" + dataNascimento + ","
-	dadosDaConta += " \"nome\":" + nome + ",",
-	dadosDaConta += " \"senha\":" + senha + "}"
+	cadeia dadosDaConta = "{\"conta\" : " + numDaConta + ","
+	dadosDaConta = dadosDaConta + " \"cpf\" : \"" + cpf  + "\","
+	dadosDaConta += " \"dtNascimento\" : \"" + dataNascimento + "\","
+	dadosDaConta += " \"nome\" : \"" + nome + "\",",
+	dadosDaConta += " \"senha\" : " + senha + "}"
 
 	escreverNoArquivo("./arquivo/contas.txt", dadosDaConta)
 	
@@ -145,8 +192,8 @@ funcao escreval(cadeia texto){
  * Esta seção do arquivo guarda informações do Portugol Studio.
  * Você pode apagá-la se estiver utilizando outro editor.
  * 
- * @POSICAO-CURSOR = 1975; 
- * @DOBRAMENTO-CODIGO = [36, 93, 99, 105, 132, 137];
+ * @POSICAO-CURSOR = 1545; 
+ * @DOBRAMENTO-CODIGO = [140, 146, 152, 179, 184];
  * @PONTOS-DE-PARADA = ;
  * @SIMBOLOS-INSPECIONADOS = ;
  * @FILTRO-ARVORE-TIPOS-DE-DADO = inteiro, real, logico, cadeia, caracter, vazio;
