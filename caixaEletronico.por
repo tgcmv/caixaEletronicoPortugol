@@ -39,15 +39,42 @@ funcao acessarConta(){
 		escreval("Conta não encontrada")
 	} senao {
 		inteiro senhaReal = o.obter_propriedade_tipo_inteiro(objConta, "senha")
+		inteiro qtdTentativas = buscaQtdTentativas(conta)
 		//explicar
 		se (senhaReal != senhaDigitada){
 			limpa()
 			escreval("Senha invalida")
+			atualizaQtdTentativas(conta, qtdTentativas + 1)			
+		} senao se (qtdTentativas > 3){
+			escreval("Senha bloqueada, procure seu gerente")
 		} senao {
 			logado = verdadeiro
+			atualizaQtdTentativas(conta, 0)
 			telaOperacaoBancaria(objConta)
 		}
 	}
+}
+
+funcao inteiro buscaQtdTentativas(inteiro conta){
+	cadeia qtd = "0"
+	cadeia caminhoArquivo = "./arquivo/senha/" + conta + "_qtd_erro_senha.txt"
+	se(a.arquivo_existe(caminhoArquivo)){
+		inteiro arq = a.abrir_arquivo(caminhoArquivo, a.MODO_LEITURA)
+		qtd = a.ler_linha(arq)					
+		a.fechar_arquivo(arq)	
+	} senao {
+		inteiro arq = a.abrir_arquivo(caminhoArquivo, a.MODO_ESCRITA)
+		a.escrever_linha(qtd, arq)
+		a.fechar_arquivo(arq)
+	}
+
+	retorne t.cadeia_para_inteiro(qtd, 10)
+}
+
+funcao atualizaQtdTentativas(inteiro conta, inteiro qtd){
+	inteiro arq = a.abrir_arquivo("./arquivo/senha/" + conta + "_qtd_erro_senha.txt", a.MODO_ESCRITA)
+	a.escrever_linha(qtd + "", arq)
+	a.fechar_arquivo(arq)
 }
 
 funcao telaOperacaoBancaria(inteiro objConta){
@@ -62,7 +89,8 @@ funcao telaOperacaoBancaria(inteiro objConta){
 		escreval(" 2 - Extrato")
 		escreval(" 3 - Saque")
 		escreval(" 4 - Deposito")
-		escreval(" 5 - Sair")
+		escreval(" 5 - Transferencia")
+		escreval(" 6 - Sair")
 		inteiro opcao
 		leia(opcao)
 		escolha(opcao){
@@ -84,7 +112,10 @@ funcao telaOperacaoBancaria(inteiro objConta){
 				enterParaContinuar()
 				pare
 			caso 5: 
-				escreva("sair escolhido")
+				transferencia(conta)
+				logado = falso
+				pare
+			caso 6: 
 				logado = falso
 				pare
 			caso contrario: 
@@ -93,6 +124,8 @@ funcao telaOperacaoBancaria(inteiro objConta){
 		}
 	}
 }
+
+funcao transferencia(inteiro conta){}
 
 funcao fazSaque(inteiro conta){
 	escreval("Qual valor você deseja sacar?")
@@ -127,7 +160,7 @@ funcao atualizaSaldo(inteiro conta, real valor){
 	saldoNovo = saldoAtual + valor
 
 	inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_saldo.txt", a.MODO_ESCRITA)
-	a.escrever_linha(valor + "", arq)
+	a.escrever_linha(saldoNovo + "", arq)
 	a.fechar_arquivo(arq)
 	
 }
@@ -155,14 +188,14 @@ funcao mostraExtrato(inteiro conta){
 funcao cadeia consultaExtrato(inteiro conta){
 	cadeia extrato = ""
 	se(a.arquivo_existe("./arquivo/conta/" + conta + "_extrato.txt")){
-		inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_extrato.txt", a.MODO_LEITURA)
+		inteiro arq = a.abrir_arquivo("./arquivo/conta/" + conta + "_extrato.txt", a.MODO_LEITURA)
 		enquanto (nao a.fim_arquivo(arq)){
 			extrato = extrato + a.ler_linha(arq) + "\n"
 		}	
 		a.fechar_arquivo(arq)	
 	} senao {
 		//cria arquivo
-		inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_extrato.txt", a.MODO_ESCRITA)
+		inteiro arq = a.abrir_arquivo("./arquivo/conta/" + conta + "_extrato.txt", a.MODO_ESCRITA)
 		a.fechar_arquivo(arq)
 	}
 
@@ -192,11 +225,11 @@ funcao enterParaContinuar(){
 funcao real consultaSaldo(inteiro conta){
 	cadeia saldo = "0"
 	se(a.arquivo_existe("./arquivo/conta/" + conta + "_saldo.txt")){
-		inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_saldo.txt", a.MODO_LEITURA)
+		inteiro arq = a.abrir_arquivo("./arquivo/conta/" + conta + "_saldo.txt", a.MODO_LEITURA)
 		saldo = a.ler_linha(arq)					
 		a.fechar_arquivo(arq)	
 	} senao {
-		inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_saldo.txt", a.MODO_ESCRITA)
+		inteiro arq = a.abrir_arquivo("./arquivo/conta/" + conta + "_saldo.txt", a.MODO_ESCRITA)
 		a.escrever_linha("0", arq)
 		a.fechar_arquivo(arq)
 	}
@@ -255,7 +288,7 @@ funcao criarConta(){
 	dadosDaConta = dadosDaConta + " \"cpf\" : \"" + cpf  + "\","
 	dadosDaConta += " \"dtNascimento\" : \"" + dataNascimento + "\","
 	dadosDaConta += " \"nome\" : \"" + nome + "\",",
-	dadosDaConta += " \"senha\" : " + senha + "}"
+	dadosDaConta += " \"senha\" : " + senha + "}"	
 
 	escreverNoArquivo("./arquivo/contas.txt", dadosDaConta)
 	
@@ -327,8 +360,8 @@ funcao cadeia obterData(){
  * Esta seção do arquivo guarda informações do Portugol Studio.
  * Você pode apagá-la se estiver utilizando outro editor.
  * 
- * @POSICAO-CURSOR = 2544; 
- * @DOBRAMENTO-CODIGO = [14, 12, 31, 122, 144, 154, 175, 184, 206, 223, 263, 269, 275, 302, 307];
+ * @POSICAO-CURSOR = 2947; 
+ * @DOBRAMENTO-CODIGO = [14, 12, 31, 57, 73, 129, 145, 155, 167, 177, 187, 208, 217, 224, 239, 256, 296, 302, 308, 335, 340];
  * @PONTOS-DE-PARADA = ;
  * @SIMBOLOS-INSPECIONADOS = ;
  * @FILTRO-ARVORE-TIPOS-DE-DADO = inteiro, real, logico, cadeia, caracter, vazio;
