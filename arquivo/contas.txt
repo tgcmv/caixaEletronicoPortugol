@@ -1,4 +1,4 @@
-{"conta" : 3020, "cpf" : "012345674890", "dtNascimento" : "20/06/1989", "nome" : "José Junior", "senha" : 123456}
-{"conta" : 1234, "cpf" : "012345674890", "dtNascimento" : "20/06/1989", "nome" : "Thiago Carvalho", "senha" : 123456}
-{"conta" : 1235, "cpf" : "012345674890", "dtNascimento" : "20/06/1989", "nome" : "José Junior", "senha" : 123456}
-{"conta" : 1236, "cpf" : "012345674890", "dtNascimento" : "20/06/1989", "nome" : "José Junior", "senha" : 123456}
+{"conta" : 3020, "cpf" : "012345674890", "dtNascimento" : "20/06/1989", "nome" : "José Junior", "senha" : 123456, "limiteCheque" : 500.00}
+{"conta" : 1234, "cpf" : "012345674890", "dtNascimento" : "20/06/1989", "nome" : "Thiago Carvalho", "senha" : 123456, "limiteCheque" : 500.00}
+{"conta" : 1235, "cpf" : "012345674890", "dtNascimento" : "20/06/1989", "nome" : "José Junior", "senha" : 123456, "limiteCheque" : 500.00}
+{"conta" : 1236, "cpf" : "012345674890", "dtNascimento" : "20/06/1989", "nome" : "José Junior", "senha" : 123456, "limiteCheque" : 500.00}

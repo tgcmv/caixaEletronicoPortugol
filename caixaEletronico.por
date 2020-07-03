@@ -113,7 +113,7 @@ funcao telaOperacaoBancaria(inteiro objConta){
 				pare
 			caso 5: 
 				transferencia(conta)
-				logado = falso
+				enterParaContinuar()
 				pare
 			caso 6: 
 				logado = falso
@@ -125,22 +125,64 @@ funcao telaOperacaoBancaria(inteiro objConta){
 	}
 }
 
-funcao transferencia(inteiro conta){}
+funcao transferencia(inteiro contaOrigem){
+	inteiro contaDestino
+	real valor
+	
+	limpa()
+	escreval("Para qual conta vc quer transferir?")
+	leia(contaDestino)
+	escreval("Qual conta valor quer transferir?")
+	leia(valor)
+
+	inteiro objConta = buscaConta(contaDestino)
+
+	se(objConta == -1){
+		escreval("Conta destino não encontrada")
+	} senao {
+		real saldo = consultaSaldo(contaOrigem)
+		se (valor > saldo){
+			limpa()
+			escreval("Você não tem limite disponivel, seu saldo é: " + saldo )
+		} senao {
+			atualizaSaldo(contaOrigem, -1*valor)
+			atualizaSaldo(contaDestino, valor)
+			
+			gravaExtrato(contaOrigem, " Transferencia realizada no valor de " + valor)
+			gravaExtrato(contaDestino, " Transferencia recebida no valor de " + valor)
+			limpa()
+			escreval("Tranferencia realizada com sucesso")
+		}
+	}
+}
 
 funcao fazSaque(inteiro conta){
 	escreval("Qual valor você deseja sacar?")
 	real valor
 	leia(valor)
 	real saldo = consultaSaldo(conta)
-	se (valor > saldo){
+	real limite = consultaLimiteChequeEspecial(conta)
+	se (valor > (saldo + limite)){
 		limpa()
 		escreval("Você não tem limite disponivel, seu saldo é: " + saldo )
+		escreval("Seu limite de cheque especial, é: " + limite )
+		
 	} senao {
-		atualizaSaldo(conta, -1*valor)
+		real saldoNovo = atualizaSaldo(conta, -1*valor)
+		
 		gravaExtrato(conta, " Saque no valor de " + valor)
+		
+		se(saldoNovo < 0){
+			gravaExtrato(conta, " Você está no cheque especial saldo: " + saldoNovo)	
+		}
 		limpa()
-		escreval("Deposito realizado com sucesso")
+		escreval("Saque realizado com sucesso")
 	}
+}
+
+funcao real consultaLimiteChequeEspecial(inteiro conta){
+	inteiro objConta = buscaConta(conta)
+	retorne o.obter_propriedade_tipo_real(objConta, "limiteCheque")
 }
 
 funcao fazDeposito(inteiro conta){
@@ -153,16 +195,16 @@ funcao fazDeposito(inteiro conta){
 	escreval("Depósitio realizado com sucesso")
 }
 
-funcao atualizaSaldo(inteiro conta, real valor){
+funcao real atualizaSaldo(inteiro conta, real valor){
 	real saldoAtual = consultaSaldo(conta)
 	real saldoNovo
 
 	saldoNovo = saldoAtual + valor
 
-	inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_saldo.txt", a.MODO_ESCRITA)
+	inteiro arq = a.abrir_arquivo("./arquivo/conta/" + conta + "_saldo.txt", a.MODO_ESCRITA)
 	a.escrever_linha(saldoNovo + "", arq)
 	a.fechar_arquivo(arq)
-	
+	retorne saldoNovo
 }
 
 funcao gravaExtrato(inteiro conta, cadeia texto){
@@ -170,7 +212,7 @@ funcao gravaExtrato(inteiro conta, cadeia texto){
 	real saldoAtual = consultaSaldo(conta)
 	real saldoNovo
 
-	inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_extrato.txt", a.MODO_ACRESCENTAR)
+	inteiro arq = a.abrir_arquivo("./arquivo/conta/" + conta + "_extrato.txt", a.MODO_ACRESCENTAR)
 	a.escrever_linha(data + " : " + texto, arq)
 	a.fechar_arquivo(arq)
 }
@@ -208,9 +250,12 @@ funcao cadeia consultaExtrato(inteiro conta){
 
 funcao mostraSaldo(inteiro conta){
 	real saldo = consultaSaldo(conta)
+	real limite = consultaLimiteChequeEspecial(conta)
 	limpa()
 	escreval("--------------")
 	escreval("Saldo: "+ saldo)
+	escreval("")
+	escreval("Limite Cheque especial: "+ limite)
 	escreval("")
 	escreval("--------------")
 }
@@ -288,8 +333,8 @@ funcao criarConta(){
 	dadosDaConta = dadosDaConta + " \"cpf\" : \"" + cpf  + "\","
 	dadosDaConta += " \"dtNascimento\" : \"" + dataNascimento + "\","
 	dadosDaConta += " \"nome\" : \"" + nome + "\",",
+	dadosDaConta += " \"limiteCheque\" : \"" + 500.00 + "\",",
 	dadosDaConta += " \"senha\" : " + senha + "}"	
-
 	escreverNoArquivo("./arquivo/contas.txt", dadosDaConta)
 	
 }
@@ -360,8 +405,8 @@ funcao cadeia obterData(){
  * Esta seção do arquivo guarda informações do Portugol Studio.
  * Você pode apagá-la se estiver utilizando outro editor.
  * 
- * @POSICAO-CURSOR = 2947; 
- * @DOBRAMENTO-CODIGO = [14, 12, 31, 57, 73, 129, 145, 155, 167, 177, 187, 208, 217, 224, 239, 256, 296, 302, 308, 335, 340];
+ * @POSICAO-CURSOR = 4263; 
+ * @DOBRAMENTO-CODIGO = [14, 12, 31, 57, 73, 79, 127, 187, 197, 209, 219, 229, 262, 269, 284, 301, 341, 347, 353, 380, 385, 391];
  * @PONTOS-DE-PARADA = ;
  * @SIMBOLOS-INSPECIONADOS = ;
  * @FILTRO-ARVORE-TIPOS-DE-DADO = inteiro, real, logico, cadeia, caracter, vazio;

@@ -1,2 +1,9 @@
 2020-7-3 18:45:5 :  Depóstio no valor de 50632.23
 2020-7-3 18:45:24 :  Saque no valor de 6000.0
+2020-7-3 19:38:26 :  Transferencia realizada no valor de 500.0
+2020-7-3 19:38:27 :  Transferencia recebida no valor de 500.0
+2020-7-3 19:42:18 :  Transferencia realizada no valor de 213.21
+2020-7-3 19:57:51 :  Saque no valor de 450.0
+2020-7-3 19:57:51 :  Você entrou no cheque especial saldo: 450.0
+2020-7-3 19:59:18 :  Saque no valor de 10.0
+2020-7-3 19:59:18 :  Você entrou no cheque especial saldo: -173.21
