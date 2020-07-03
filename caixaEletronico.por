@@ -4,6 +4,8 @@ inclua biblioteca Arquivos --> a
 inclua biblioteca Util --> util
 inclua biblioteca Texto --> tx
 inclua biblioteca Objetos --> o
+inclua biblioteca Tipos --> t
+inclua biblioteca Calendario --> c
 	
 cadeia idioma = "ptBr"
 logico logado = falso
@@ -29,21 +31,28 @@ funcao inicio()
 
 funcao acessarConta(){
 	escreval("Digite o numero da sua conta e sua senha de 6 digitos")
-	inteiro conta, senha
-	leia(conta, senha)
+	inteiro conta, senhaDigitada
+	leia(conta, senhaDigitada)
 	inteiro objConta = buscaConta(conta)
 
 	se(objConta == -1){
 		escreval("Conta não encontrada")
 	} senao {
-		//TODO validar senha
-		logado = verdadeiro
-		telaOperacaoBancaria(objConta)
+		inteiro senhaReal = o.obter_propriedade_tipo_inteiro(objConta, "senha")
+		//explicar
+		se (senhaReal != senhaDigitada){
+			limpa()
+			escreval("Senha invalida")
+		} senao {
+			logado = verdadeiro
+			telaOperacaoBancaria(objConta)
+		}
 	}
 }
 
 funcao telaOperacaoBancaria(inteiro objConta){
 	cadeia nome = o.obter_propriedade_tipo_cadeia(objConta, "nome")
+	inteiro conta = o.obter_propriedade_tipo_inteiro(objConta, "conta")
 	
 	enquanto(logado){
 		limpa()
@@ -59,16 +68,20 @@ funcao telaOperacaoBancaria(inteiro objConta){
 		escolha(opcao){
 
 			caso 1: 
-				escreva("saldo escolhido")
+				mostraSaldo(conta)
+				enterParaContinuar()
 				pare
 			caso 2: 
-				escreva("extrato escolhido")
+				mostraExtrato(conta)
+				enterParaContinuar()
 				pare
 			caso 3: 
-				escreva("saque escolhido")
+				fazSaque(conta)
+				enterParaContinuar()
 				pare
 			caso 4: 
-				escreva("deposito escolhido")
+				fazDeposito(conta)
+				enterParaContinuar()
 				pare
 			caso 5: 
 				escreva("sair escolhido")
@@ -79,6 +92,116 @@ funcao telaOperacaoBancaria(inteiro objConta){
 				pare
 		}
 	}
+}
+
+funcao fazSaque(inteiro conta){
+	escreval("Qual valor você deseja sacar?")
+	real valor
+	leia(valor)
+	real saldo = consultaSaldo(conta)
+	se (valor > saldo){
+		limpa()
+		escreval("Você não tem limite disponivel, seu saldo é: " + saldo )
+	} senao {
+		atualizaSaldo(conta, -1*valor)
+		gravaExtrato(conta, " Saque no valor de " + valor)
+		limpa()
+		escreval("Deposito realizado com sucesso")
+	}
+}
+
+funcao fazDeposito(inteiro conta){
+	escreval("Qual valor você deseja depositar?")
+	real valor
+	leia(valor)
+	atualizaSaldo(conta, valor)
+	gravaExtrato(conta, " Depósitio no valor de " + valor)
+	limpa()
+	escreval("Depósitio realizado com sucesso")
+}
+
+funcao atualizaSaldo(inteiro conta, real valor){
+	real saldoAtual = consultaSaldo(conta)
+	real saldoNovo
+
+	saldoNovo = saldoAtual + valor
+
+	inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_saldo.txt", a.MODO_ESCRITA)
+	a.escrever_linha(valor + "", arq)
+	a.fechar_arquivo(arq)
+	
+}
+
+funcao gravaExtrato(inteiro conta, cadeia texto){
+	cadeia data = obterData()
+	real saldoAtual = consultaSaldo(conta)
+	real saldoNovo
+
+	inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_extrato.txt", a.MODO_ACRESCENTAR)
+	a.escrever_linha(data + " : " + texto, arq)
+	a.fechar_arquivo(arq)
+}
+
+funcao mostraExtrato(inteiro conta){
+	cadeia extrato = consultaExtrato(conta)
+	limpa()
+	mostraSaldo(conta)
+	escreval("--------------")
+	escreval("Extrato: ")
+	escreval(extrato)
+	escreval("--------------")
+}
+
+funcao cadeia consultaExtrato(inteiro conta){
+	cadeia extrato = ""
+	se(a.arquivo_existe("./arquivo/conta/" + conta + "_extrato.txt")){
+		inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_extrato.txt", a.MODO_LEITURA)
+		enquanto (nao a.fim_arquivo(arq)){
+			extrato = extrato + a.ler_linha(arq) + "\n"
+		}	
+		a.fechar_arquivo(arq)	
+	} senao {
+		//cria arquivo
+		inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_extrato.txt", a.MODO_ESCRITA)
+		a.fechar_arquivo(arq)
+	}
+
+	se (extrato == "" ou extrato == "\n"){
+		extrato = " Sem dados "
+	}
+	
+	retorne extrato
+}
+
+funcao mostraSaldo(inteiro conta){
+	real saldo = consultaSaldo(conta)
+	limpa()
+	escreval("--------------")
+	escreval("Saldo: "+ saldo)
+	escreval("")
+	escreval("--------------")
+}
+
+funcao enterParaContinuar(){
+	escreval("Aperte enter para continuar")
+	cadeia algo
+	leia(algo)
+	limpa()
+}
+
+funcao real consultaSaldo(inteiro conta){
+	cadeia saldo = "0"
+	se(a.arquivo_existe("./arquivo/conta/" + conta + "_saldo.txt")){
+		inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_saldo.txt", a.MODO_LEITURA)
+		saldo = a.ler_linha(arq)					
+		a.fechar_arquivo(arq)	
+	} senao {
+		inteiro arq = a.abrir_arquivo("./arquivo/conta/1234_saldo.txt", a.MODO_ESCRITA)
+		a.escrever_linha("0", arq)
+		a.fechar_arquivo(arq)
+	}
+
+	retorne t.cadeia_para_real(saldo)
 }
 
 funcao inteiro buscaConta(inteiro conta){
@@ -94,7 +217,7 @@ funcao inteiro buscaConta(inteiro conta){
 			pare
 		}
 	}
-
+	a.fechar_arquivo(arq)
 	retorne objConta;
 }
 
@@ -186,14 +309,26 @@ funcao escreval(cadeia texto){
 	//cadeia texto = lerArquivo(idioma, nomeMensagem)
 	escreva(texto + "\n")
 }
+
+
+funcao cadeia obterData(){
+	retorne 
+		+ c.ano_atual() + "-"
+		+ c.mes_atual() + "-"
+		+ c.dia_mes_atual() + " "
+		+ c.hora_atual(falso) + ":"
+		+ c.minuto_atual() + ":"
+		+ c.segundo_atual() 
+}
+
 }
 /* $$$ Portugol Studio $$$ 
  * 
  * Esta seção do arquivo guarda informações do Portugol Studio.
  * Você pode apagá-la se estiver utilizando outro editor.
  * 
- * @POSICAO-CURSOR = 1545; 
- * @DOBRAMENTO-CODIGO = [140, 146, 152, 179, 184];
+ * @POSICAO-CURSOR = 2544; 
+ * @DOBRAMENTO-CODIGO = [14, 12, 31, 122, 144, 154, 175, 184, 206, 223, 263, 269, 275, 302, 307];
  * @PONTOS-DE-PARADA = ;
  * @SIMBOLOS-INSPECIONADOS = ;
  * @FILTRO-ARVORE-TIPOS-DE-DADO = inteiro, real, logico, cadeia, caracter, vazio;
