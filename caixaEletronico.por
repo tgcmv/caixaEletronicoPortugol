@@ -333,9 +333,11 @@ funcao criarConta(){
 	dadosDaConta = dadosDaConta + " \"cpf\" : \"" + cpf  + "\","
 	dadosDaConta += " \"dtNascimento\" : \"" + dataNascimento + "\","
 	dadosDaConta += " \"nome\" : \"" + nome + "\",",
-	dadosDaConta += " \"limiteCheque\" : \"" + 500.00 + "\",",
+	dadosDaConta += " \"limiteCheque\" : " + 500.00 + ",",
 	dadosDaConta += " \"senha\" : " + senha + "}"	
 	escreverNoArquivo("./arquivo/contas.txt", dadosDaConta)
+
+	escreval("conta criado com o numero: " + numDaConta)
 	
 }
 
@@ -405,8 +407,8 @@ funcao cadeia obterData(){
  * Esta seção do arquivo guarda informações do Portugol Studio.
  * Você pode apagá-la se estiver utilizando outro editor.
  * 
- * @POSICAO-CURSOR = 4263; 
- * @DOBRAMENTO-CODIGO = [14, 12, 31, 57, 73, 79, 127, 187, 197, 209, 219, 229, 262, 269, 284, 301, 341, 347, 353, 380, 385, 391];
+ * @POSICAO-CURSOR = 8856; 
+ * @DOBRAMENTO-CODIGO = [14, 12, 31, 57, 73, 79, 127, 187, 197, 209, 219, 229, 262, 269, 284, 349, 355, 382, 387, 393];
  * @PONTOS-DE-PARADA = ;
  * @SIMBOLOS-INSPECIONADOS = ;
  * @FILTRO-ARVORE-TIPOS-DE-DADO = inteiro, real, logico, cadeia, caracter, vazio;
